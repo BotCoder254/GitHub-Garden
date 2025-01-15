@@ -83,7 +83,8 @@ Before | After
 
 <div align="center">
   
-![GitHub Activity Graph](https://activity-graph.herokuapp.com/graph?username=BotCoder254&theme=github)
+![GitHub Activity Graph](https://github-readme-activity-graph.vercel.app/graph?username=BotCoder254&repo=GitHub-Garden&theme=github)
+
 
 <p align="center">
   <img src="https://github-readme-streak-stats.herokuapp.com/?user=BotCoder254&theme=radical" />
