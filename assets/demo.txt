@@ -1,0 +1,15 @@
+To create your demo video:
+
+1. Record your screen while running the GitHub Garden tool
+2. Save the recording as 'demo.mp4'
+3. Place it in this directory
+4. Recommended video specs:
+   - Resolution: 1280x720 or 1920x1080
+   - Duration: 30-60 seconds
+   - Format: MP4
+   - Codec: H.264
+   - Include:
+     - Installation process
+     - Configuration
+     - Running the tool
+     - Final results

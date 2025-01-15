@@ -1,0 +1,24 @@
+{
+  "name": "git",
+  "version": "1.0.0",
+  "main": "generate-contributions.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node generate-contributions.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "boxen": "^5.1.2",
+    "chalk": "^4.1.2",
+    "chalk-animation": "^1.6.0",
+    "cli-progress": "^3.12.0",
+    "dotenv": "^16.3.1",
+    "figlet": "^1.7.0",
+    "gradient-string": "^3.0.0",
+    "nanospinner": "^1.1.0",
+    "ora": "^5.4.1"
+  }
+}
