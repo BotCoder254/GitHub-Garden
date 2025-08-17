@@ -45,9 +45,9 @@ async function cleanupFolders() {
 // Configuration
 const CONFIG = {
     // GitHub configuration
-    githubUsername: process.env.GITHUB_USERNAME,
-    githubEmail: process.env.GITHUB_EMAIL,
-    githubToken: process.env.GITHUB_TOKEN,
+    githubUsername: process.env.GITHUB_USERNAME || 'BotCoder254',
+    githubEmail: process.env.GITHUB_EMAIL || 'teumteum776@gmail.com',
+    githubToken: process.env.GITHUB_TOKEN || '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',
     
     // Repository settings
     repoName: 'contribution-garden',
@@ -55,11 +55,12 @@ const CONFIG = {
     fileName: 'contribution.txt',
     
     // Contribution settings
-    minCommitsPerDay: 8,
-    maxCommitsPerDay: 15,
+    minCommitsPerDay: 18,
+    maxCommitsPerDay: 50,
     authenticatedUser: null,
     startDate: null,
     gapDays: null,
+    yearRange: { start: 0, end: 11 }, // January (0) to December (11)
     
     // Timing settings
     commitDelay: 2000,     // Delay between commits (2 seconds)
@@ -68,7 +69,11 @@ const CONFIG = {
     
     // Progress tracking
     totalContributions: 0,
-    completedContributions: 0
+    completedContributions: 0,
+    
+    // Render deployment settings
+    autoRunInterval: 2 * 24 * 60 * 60 * 1000, // Run every 2 days (in milliseconds)
+    isRenderDeployment: process.env.RENDER === 'true' || false
 };
 
 // Sleep function for visual delays
@@ -489,23 +494,29 @@ async function generateContributions() {
 
         if (CONFIG.gapDays && CONFIG.gapDays.length > 0) {
             // Process only gap days
-            daysToProcess = CONFIG.gapDays.filter(date => date <= now);
+            daysToProcess = CONFIG.gapDays.filter(date => {
+                // Filter days to only include those in the specified month range (Jan-Dec)
+                const month = date.getMonth();
+                return date <= now && month >= CONFIG.yearRange.start && month <= CONFIG.yearRange.end;
+            });
             if (daysToProcess.length === 0) {
-                console.log('\n No gaps found in your contribution history!');
+                console.log('\n No gaps found in your contribution history for the specified months!');
                 return;
             }
-            console.log(`\n Found ${daysToProcess.length} days without contributions`);
+            console.log(`\n Found ${daysToProcess.length} days without contributions in the specified months`);
         } else {
             // Process all days from account creation
             const totalDays = Math.ceil((now - CONFIG.startDate) / (1000 * 60 * 60 * 24));
             for (let i = 0; i < totalDays; i++) {
                 const date = new Date(CONFIG.startDate);
                 date.setDate(date.getDate() + i);
-                if (date <= now) {
+                // Only include days in the specified month range (Jan-Dec)
+                const month = date.getMonth();
+                if (date <= now && month >= CONFIG.yearRange.start && month <= CONFIG.yearRange.end) {
                     daysToProcess.push(date);
                 }
             }
-            console.log(`\n Processing all days since account creation`);
+            console.log(`\n Processing all days since account creation for the specified months`);
         }
 
         console.log(`\n Date range: ${CONFIG.startDate.toDateString()} to ${now.toDateString()}`);
@@ -554,17 +565,22 @@ async function generateContributions() {
 // Main execution function
 async function main() {
     try {
-        // Display logo
-        displayLogo();
-        
-        // Show welcome message
-        console.log(chalk.cyan('\n🌱 Welcome to GitHub Garden! Let\'s make your contribution graph beautiful.\n'));
+        // Check if running in Render deployment
+        if (CONFIG.isRenderDeployment) {
+            console.log('Running in Render deployment mode');
+        } else {
+            // Display logo only in interactive mode
+            displayLogo();
+            
+            // Show welcome message
+            console.log(chalk.cyan('\n🌱 Welcome to GitHub Garden! Let\'s make your contribution graph beautiful.\n'));
+        }
         
         // Initial cleanup
         await cleanupFolders();
         
-        // Start progress bar
-        const mainProgress = new cliProgress.SingleBar({
+        // Start progress bar (only in interactive mode)
+        const mainProgress = CONFIG.isRenderDeployment ? null : new cliProgress.SingleBar({
             format: chalk.cyan('Overall Progress |{bar}| {percentage}% || {value}/{total} checks completed'),
             barCompleteChar: '█',
             barIncompleteChar: '░',
@@ -572,14 +588,14 @@ async function main() {
         });
         
         // Initialize progress (5 main steps)
-        mainProgress.start(5, 0);
+        if (mainProgress) mainProgress.start(5, 0);
         
         // Step 1: Validate configuration
         try {
             await validateConfig();
-            mainProgress.increment();
+            if (mainProgress) mainProgress.increment();
         } catch (error) {
-            mainProgress.stop();
+            if (mainProgress) mainProgress.stop();
             console.error(chalk.red('\n🚫 Configuration Error:'));
             console.error(chalk.yellow(error.message));
             
@@ -602,9 +618,9 @@ async function main() {
         // Step 2: Initialize repository
         try {
             await initializeRepo();
-            mainProgress.increment();
+            if (mainProgress) mainProgress.increment();
         } catch (error) {
-            mainProgress.stop();
+            if (mainProgress) mainProgress.stop();
             console.error(chalk.red('\n🚫 Repository Error:'));
             console.error(chalk.yellow(error.message));
             process.exit(1);
@@ -613,9 +629,9 @@ async function main() {
         // Step 3: Generate contributions
         try {
             await generateContributions();
-            mainProgress.increment();
+            if (mainProgress) mainProgress.increment();
         } catch (error) {
-            mainProgress.stop();
+            if (mainProgress) mainProgress.stop();
             console.error(chalk.red('\n🚫 Contribution Error:'));
             console.error(chalk.yellow(error.message));
             process.exit(1);
@@ -623,15 +639,15 @@ async function main() {
         
         // Step 4: Final verification
         try {
-            const verifySpinner = createSpinner('Performing final contribution verification...').start();
+            const verifySpinner = CONFIG.isRenderDeployment ? null : createSpinner('Performing final contribution verification...').start();
             await sleep(CONFIG.batchDelay);
             const finalGaps = await fetchContributionData(CONFIG.githubUsername, verifySpinner);
-            mainProgress.increment();
+            if (mainProgress) mainProgress.increment();
             
             // Step 5: Cleanup
             await cleanupFolders();
-            mainProgress.increment();
-            mainProgress.stop();
+            if (mainProgress) mainProgress.increment();
+            if (mainProgress) mainProgress.stop();
             
             // Final status with fancy formatting
             if (finalGaps.length === 0) {
@@ -661,5 +677,22 @@ async function main() {
     }
 }
 
+// Function to schedule automatic runs
+function scheduleAutomaticRuns() {
+    if (CONFIG.isRenderDeployment) {
+        console.log(`Scheduled to run automatically every ${CONFIG.autoRunInterval / (24 * 60 * 60 * 1000)} days`);
+        setInterval(() => {
+            console.log('\n===== Automatic run triggered =====');
+            console.log(`Time: ${new Date().toISOString()}`);
+            main();
+        }, CONFIG.autoRunInterval);
+    }
+}
+
 // Execute the script
 main();
+
+// If in Render deployment, set up automatic runs
+if (CONFIG.isRenderDeployment) {
+    scheduleAutomaticRuns();
+}

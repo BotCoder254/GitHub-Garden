@@ -36,6 +36,9 @@
 - 🌈 **Beautiful UI** - Modern terminal interface
 - 🔄 **Auto Recovery** - Handles interruptions gracefully
 - 📱 **Cross Platform** - Works on Windows and Unix
+- 🗓️ **Full Year Coverage** - Checks contributions from January to December
+- 🚀 **Enhanced Commits** - Up to 50 commits per day
+- ☁️ **Cloud Deployment** - Automatic runs on Render every 2 days
 
 ## 🚀 Quick Commands
 
@@ -66,6 +69,15 @@ export GITHUB_EMAIL="your_email"
 npm install -g github-garden
 github-garden start
 ```
+
+### Cloud Deployment with Render
+
+```bash
+# Deploy to Render for automatic runs every 2 days
+npm run render
+```
+
+For detailed instructions on deploying to Render, see [RENDER_DEPLOYMENT.md](./RENDER_DEPLOYMENT.md)
 <!-- 
 ## 🎮 Usage
 

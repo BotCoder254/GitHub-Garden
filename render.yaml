@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: github-garden
+    env: node
+    buildCommand: npm install
+    startCommand: npm run render
+    envVars:
+      - key: GITHUB_USERNAME
+        sync: false
+      - key: GITHUB_EMAIL
+        sync: false
+      - key: GITHUB_TOKEN
+        sync: false
+      - key: RENDER
+        value: true
+    plan: free

@@ -1,15 +1,16 @@
 {
-  "name": "git",
+  "name": "github-garden",
   "version": "1.0.0",
   "main": "generate-contributions.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node generate-contributions.js"
+    "start": "node generate-contributions.js",
+    "render": "RENDER=true node generate-contributions.js"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": ["github", "contributions", "automation"],
+  "author": "TELVIN TEUM",
   "license": "ISC",
-  "description": "",
+  "description": "A tool to fill your GitHub contribution graph with commits from January to December",
   "dependencies": {
     "boxen": "^5.1.2",
     "chalk": "^4.1.2",
